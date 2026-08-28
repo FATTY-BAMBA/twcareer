@@ -9,6 +9,17 @@ Produce application material for one specific job posting, in which **every subs
 
 Speak to the user bilingually: 繁體中文 first, English second, on separate lines. Résumé content itself follows the language of the job description.
 
+## Step 0a — Say which version is running
+
+While twcareer is in preview, begin every run by reading `version` from
+`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` and stating it in one line:
+`twcareer v<version>`.
+
+Read it; do not recall it. A hardcoded version string is exactly the kind of
+claim that goes stale and then lies — and the whole point of this tool is not
+making claims it cannot check. This also makes a stale installed copy visible
+immediately, instead of after a run that silently used old rules.
+
 ## Step 0 — Locate the career workspace
 
 Run `pwd`. Look for `career/profile.md` relative to it.

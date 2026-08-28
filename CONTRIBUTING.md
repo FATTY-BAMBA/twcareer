@@ -20,6 +20,8 @@ The two `.claude-plugin/` directories are at different levels on purpose. `marke
 edit  →  bump version in plugins/twcareer/.claude-plugin/plugin.json  →  push  →  update in Cowork
 ```
 
+The skill reports its version at the start of every run by reading `plugin.json`, so a stale installed copy announces itself instead of silently applying old rules. Nothing to maintain by hand.
+
 **Always bump the version.** Update detection keys off the `version` field in `plugin.json`. Push a change without bumping and installed copies will not see it — and you will spend an hour debugging a fix that shipped correctly.
 
 ## Versioning
@@ -42,6 +44,19 @@ Anything that changes the shape of `career/profile.md` or `claims.json` is break
    ```
 
    No dependencies; the fixtures live in `tests/fixtures/`. Add a case whenever you add a validation rule — a rule without a test is a rule that will regress quietly.
+
+   After a real adversarial run, check the rendered output too:
+
+   ```bash
+   python3 tests/check_adversarial.py career/outputs/<folder> \
+       --profile career/profile.md \
+       --claims career/outputs/<folder>/claims.json \
+       --forbid Python SQL RAG Docker
+   ```
+
+   It asserts that no forbidden capability reached the application, that each
+   one is surfaced in `gaps.md`, that every evidence row resolves, and that a
+   fake ID and a misspelled section still fail the build.
 3. Bump the version.
 
 ## Testing a change
