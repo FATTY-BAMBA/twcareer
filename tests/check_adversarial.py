@@ -94,6 +94,47 @@ def main():
 
     outdir = Path(args.outdir)
     profile_path = Path(args.profile)
+
+    if not outdir.is_dir():
+        sibling = outdir.parent
+        print(f"error: {outdir} does not exist.", file=sys.stderr)
+        if outdir.name in ("FOLDER", "<folder>", "folder"):
+            print(
+                "That looks like the placeholder. Replace it with the folder "
+                "twcareer actually created.",
+                file=sys.stderr,
+            )
+        if sibling.is_dir():
+            found = sorted(p.name for p in sibling.iterdir() if p.is_dir())
+            print(
+                f"Folders in {sibling}: {', '.join(found) if found else '(none)'}",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"{sibling} does not exist either — nothing has been rendered yet. "
+                "Run /twcareer:cv first; this checker inspects its output.",
+                file=sys.stderr,
+            )
+        return 1
+
+    missing = [n for n in ("104-application.md", "gaps.md", "evidence-map.md") if not (outdir / n).is_file()]
+    if missing:
+        print(
+            f"error: {outdir} is missing {', '.join(missing)}. "
+            "Either the render failed or this is not an application output folder.",
+            file=sys.stderr,
+        )
+        return 1
+
+    if not profile_path.is_file():
+        print(f"error: no such profile: {profile_path}", file=sys.stderr)
+        return 1
+
+    if args.claims and not Path(args.claims).is_file():
+        print(f"error: no such claims file: {args.claims}", file=sys.stderr)
+        return 1
+
     application = (outdir / "104-application.md").read_text(encoding="utf-8")
     gaps = (outdir / "gaps.md").read_text(encoding="utf-8")
     evidence = (outdir / "evidence-map.md").read_text(encoding="utf-8")
