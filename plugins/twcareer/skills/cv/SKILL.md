@@ -88,7 +88,7 @@ Never upgrade a state to make the application look better. An `UNSUPPORTED` requ
 
 Write `career/outputs/<company>-<role>/claims.json` following the schema documented in `references/output-104.md`.
 
-Every claim object needs `text`, `state`, and — for `SUPPORTED` — an `evidence_id` pointing at a real profile ID. Rewriting is allowed and encouraged: turn 「負責社群媒體」 into a specific, concrete description of what they actually did. Adding facts is not. If a number was not in the source and the user did not state it, it does not appear.
+Every claim object needs `text`, `state`, and — for `SUPPORTED` — `evidence_ids`, a list of real profile IDs. The renderer resolves every one of them against `profile.md` and refuses the whole file if any does not exist, so a plausible-looking ID is not a way through. There is no `source` field: the source is read from the cited profile entry at render time. Rewriting is allowed and encouraged: turn 「負責社群媒體」 into a specific, concrete description of what they actually did. Adding facts is not. If a number was not in the source and the user did not state it, it does not appear.
 
 ## Step 5 — Render deterministically
 
@@ -98,7 +98,9 @@ Do not hand-write the final output. Run:
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/render_application.py" career/outputs/<company>-<role>/claims.json
 ```
 
-The renderer drops any claim not in `SUPPORTED` or `USER_CONFIRMED` and routes it to the gap report. This is enforced in code, not by instruction — if the script rejects the file, fix the claims, never work around the script or write the output manually.
+The renderer finds `career/profile.md` by walking up from the claims file; pass `--profile <path>` if it lives elsewhere.
+
+It drops any claim not in `SUPPORTED` or `USER_CONFIRMED` and routes it to the gap report, and it rejects the file outright when an `evidence_ids` entry does not exist in the profile, when an unknown or misspelled field appears, or when nothing at all is evidenced. This is enforced in code, not by instruction — if the script rejects the file, fix the claims, never work around the script or write the output manually.
 
 It produces, in the same folder:
 

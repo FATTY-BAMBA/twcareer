@@ -9,6 +9,7 @@ plugins/twcareer/
   skills/cv/SKILL.md
   skills/cv/references/*.md         ← Taiwan judgment, one module per topic
   scripts/render_application.py     ← the evidence filter
+tests/                              ← renderer tests; run before every release
 ```
 
 The two `.claude-plugin/` directories are at different levels on purpose. `marketplace.json` sits at the repo root; `plugin.json` sits inside the plugin's own folder. They are not interchangeable and cannot share a directory.
@@ -34,13 +35,13 @@ Anything that changes the shape of `career/profile.md` or `claims.json` is break
 ## Before pushing
 
 1. `git status` — confirm no `career/`, no `*.pdf`, no `profile.md`. The `.gitignore` covers these, but check anyway. A résumé in a public repo stays in git history after deletion.
-2. Run the renderer against a test claims file and confirm it still drops unevidenced claims:
+2. Run the test suite. It covers the checks the product is built on — an unevidenced claim never reaching the application, and a `SUPPORTED` claim citing an ID that does not exist in `profile.md` failing the build rather than rendering.
 
    ```bash
-   python3 plugins/twcareer/scripts/render_application.py path/to/claims.json
+   python3 -m unittest discover tests
    ```
 
-   Deliberately break a claim — remove an `evidence_id` from a `SUPPORTED` one — and confirm it exits `2` rather than rendering. That check is the product; it should be exercised before every release.
+   No dependencies; the fixtures live in `tests/fixtures/`. Add a case whenever you add a validation rule — a rule without a test is a rule that will regress quietly.
 3. Bump the version.
 
 ## Testing a change
