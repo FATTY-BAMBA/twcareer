@@ -1,0 +1,13 @@
+{
+  "name": "twcareer",
+  "owner": {
+    "name": "PrimeStride AI"
+  },
+  "plugins": [
+    {
+      "name": "twcareer",
+      "source": "./plugins/twcareer",
+      "description": "台灣職涯 Copilot — tailors your résumé to a specific Taiwan job posting using only experience you can evidence, and produces paste-ready 104 application sections."
+    }
+  ]
+}

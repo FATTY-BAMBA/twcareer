@@ -1,0 +1,23 @@
+# ── Personal career data must NEVER be committed ──────────────────────────
+# This repo is public. A résumé pushed here is public forever, including in
+# git history after deletion. The plugin writes user data into career/ —
+# keep every form of it out.
+career/
+**/career/
+*profile.md
+*source-resume*
+*claims.json
+*104-application.md
+*evidence-map.md
+*gaps.md
+*.pdf
+*.docx
+*.doc
+
+# ── Everything else ───────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.DS_Store
+*.plugin
+.venv/
+node_modules/
