@@ -17,7 +17,8 @@ Every evidence-bearing entry carries a stable ID:
 Rules that must not be broken:
 
 - IDs are assigned once and **never reused, renumbered, or reordered**. Deleting `EXP-02` leaves a gap; the next new entry is `EXP-06`, not `EXP-02`.
-- Every ID records where it came from in its `Source:` line — the résumé file and roughly where in it, or `使用者於 YYYY-MM-DD 補充` for things the user stated in conversation.
+- Every ID records where it came from in its `Source:` line — the résumé file and roughly where in it, or `使用者於 YYYY-MM-DD 補充` for things the user stated in conversation. This is enforced: the renderer refuses to build an application citing an entry that has no `Source:`, because it would have no provenance to display. An entry no claim cites may stay unfinished.
+- The `Schema version:` line near the top is required. The renderer reads it and stops if the profile is a shape it does not understand, so a profile cannot quietly drift out of step with the claims schema.
 - Claims in generated applications point at these IDs. If an ID moves, every past application's evidence map becomes wrong.
 
 ## Template

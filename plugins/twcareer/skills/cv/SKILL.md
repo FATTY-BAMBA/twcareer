@@ -9,17 +9,20 @@ Produce application material for one specific job posting, in which **every subs
 
 Speak to the user bilingually: 繁體中文 first, English second, on separate lines. Résumé content itself follows the language of the job description.
 
-## Step 0 — Announce the build, then locate the workspace
+## Step 0a — Say which version is running
 
-First, print which build is running:
+While twcareer is in preview, begin every run by reading `version` from
+`${CLAUDE_PLUGIN_ROOT}/.claude-plugin/plugin.json` and stating it in one line:
+`twcareer v<version>`.
 
-```bash
-python3 "${CLAUDE_PLUGIN_ROOT}/scripts/render_application.py" --version
-```
+Read it; do not recall it. A hardcoded version string is exactly the kind of
+claim that goes stale and then lies — and the whole point of this tool is not
+making claims it cannot check. This also makes a stale installed copy visible
+immediately, instead of after a run that silently used old rules.
 
-Show that line to the user before anything else. During preview this is not decoration: an installed copy can silently differ from the repo, and without the version on screen you cannot tell whether a bug you are chasing exists in the committed code or only in a stale install.
+## Step 0 — Locate the career workspace
 
-Then run `pwd`. Look for `career/profile.md` relative to it.
+Run `pwd`. Look for `career/profile.md` relative to it.
 
 ### 0a. Durability check — do this before writing anything
 
@@ -96,7 +99,7 @@ Never upgrade a state to make the application look better. An `UNSUPPORTED` requ
 
 Write `career/outputs/<company>-<role>/claims.json` following the schema documented in `references/output-104.md`.
 
-Every claim object needs `text`, `state`, and — for `SUPPORTED` — an `evidence_id` pointing at a real profile ID. Rewriting is allowed and encouraged: turn 「負責社群媒體」 into a specific, concrete description of what they actually did. Adding facts is not. If a number was not in the source and the user did not state it, it does not appear.
+Every claim object needs `text`, `state`, and — for `SUPPORTED` — `evidence_ids`, a list of real profile IDs. The renderer resolves every one of them against `profile.md` and refuses the whole file if any does not exist, so a plausible-looking ID is not a way through. There is no `source` field: the source is read from the cited profile entry at render time. Rewriting is allowed and encouraged: turn 「負責社群媒體」 into a specific, concrete description of what they actually did. Adding facts is not. If a number was not in the source and the user did not state it, it does not appear.
 
 ## Step 5 — Render deterministically
 
@@ -106,7 +109,9 @@ Do not hand-write the final output. Run:
 python3 "${CLAUDE_PLUGIN_ROOT}/scripts/render_application.py" career/outputs/<company>-<role>/claims.json
 ```
 
-The renderer drops any claim not in `SUPPORTED` or `USER_CONFIRMED` and routes it to the gap report. This is enforced in code, not by instruction — if the script rejects the file, fix the claims, never work around the script or write the output manually.
+The renderer finds `career/profile.md` by walking up from the claims file; pass `--profile <path>` if it lives elsewhere.
+
+It drops any claim not in `SUPPORTED` or `USER_CONFIRMED` and routes it to the gap report, and it rejects the file outright when an `evidence_ids` entry does not exist in the profile, when an unknown or misspelled field appears, or when nothing at all is evidenced. This is enforced in code, not by instruction — if the script rejects the file, fix the claims, never work around the script or write the output manually.
 
 It produces, in the same folder:
 
