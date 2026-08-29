@@ -103,6 +103,32 @@ Deal breakers:
 - When the user supplies something in conversation, add it with a new ID and a `Source:` of `使用者於 YYYY-MM-DD 補充`. That provenance is what later lets a claim qualify as `USER_CONFIRMED`.
 - Keep the file readable. The user will open it.
 
+## Source lines are read by the renderer
+
+The renderer decides whether a claim is document-backed or self-reported by reading each cited entry's `Source:` line. Write them in one of exactly two shapes:
+
+```
+Source: <resume file> — <roughly where in it>
+Source: USER_CONFIRMED YYYY-MM-DD — 使用者本人陳述：「<their own words>」<scope limits>
+```
+
+A self-reported entry whose Source is phrased some other way will be read as document-backed, and the application will claim a stronger provenance than it has. This has happened once already; it is not hypothetical.
+
+Always record the scope limit the user gave, in their words — 「沒有 CI/CD 經驗」, 「只在個人專案」. A later application can then resolve the skill without resolving the limit.
+
+## When the user contradicts the source résumé
+
+The résumé is a document from a point in time; the user knows more than it does. A later statement is not invalid — but it must not silently overwrite history.
+
+When the user supplies something the source résumé lists as absent, record both, with dates:
+
+```
+- SKILL-14 SQL 查詢（SELECT / GROUP BY / 簡單 JOIN） | Source: USER_CONFIRMED 2026-08-29 — 使用者本人陳述：「…」
+  Conflict: 原始履歷（twcareer-test-resume.md）將 SQL 列為未具備；使用者於 2026-08-29 補充個人練習經驗。以使用者陳述為準，保留原始紀錄以供追溯。
+```
+
+Tell the user you noticed, in one line, and let them confirm which is right before writing. Never delete the earlier record — a profile that quietly disagrees with the document it was built from is worse than one that shows its working.
+
 ## What must never go in
 
 - Government ID numbers (身分證字號), bank or card numbers

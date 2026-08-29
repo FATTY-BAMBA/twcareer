@@ -83,7 +83,22 @@ RETIRED_CLAIM_KEYS = {
     ),
 }
 
-SELF_REPORTED_MARKERS = ("使用者於", "使用者補充", "user-supplied", "user supplied")
+# What a profile Source: line looks like when the fact came from the user's own
+# mouth rather than a document. The skill writes "USER_CONFIRMED <date> —
+# 使用者本人陳述：…"; earlier profiles used 使用者於/使用者補充. Miss a spelling here
+# and a self-reported entry silently renders as document-backed, which is the
+# exact misrepresentation this tool exists to prevent — so match generously.
+SELF_REPORTED_MARKERS = (
+    "USER_CONFIRMED",
+    "使用者於",
+    "使用者補充",
+    "使用者本人陳述",
+    "使用者口述",
+    "使用者自述",
+    "user-supplied",
+    "user supplied",
+    "user-confirmed",
+)
 
 
 class ValidationError(Exception):
@@ -522,11 +537,11 @@ def build_evidence_map(rows):
     out.append("|---|---|---|---|")
     for row in rows:
         mark = "✓ 使用者補充" if row["self_reported"] else "✓ 原始文件"
-        ref = ", ".join(row["ids"]) or mark
+        ref = ", ".join(row["ids"])
         cells = [
             row["section"],
             row["text"].replace("|", "\\|"),
-            f"{mark}　{ref}".strip(),
+            f"{mark}　{ref}".strip() if ref else mark,
             row["source"].replace("|", "\\|"),
         ]
         out.append("| " + " | ".join(cells) + " |")

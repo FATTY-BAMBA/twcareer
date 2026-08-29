@@ -202,6 +202,52 @@ class TestEvidenceResolution(RendererTestCase):
         self.assertEqual(code, 0, log)
         self.assertIn("source-resume.pdf — 工作經歷 #1", self.read(out, "evidence-map.md"))
 
+    def test_user_confirmed_source_vocabulary_is_recognised(self):
+        """A Source: line written as the skill actually writes it is self-reported.
+
+        Regression for a live defect: profile.md entries created by /twcareer:cv
+        read `Source: USER_CONFIRMED <date> — 使用者本人陳述：…`, which matched none
+        of the recognised markers. The claim therefore rendered as 原始文件 while
+        its own 出處 column printed USER_CONFIRMED beside it — the application
+        overstating its provenance by one tier.
+        """
+        doc = document(summary=[claim("以 Python 呼叫 OpenAI API", evidence_ids=["SKILL-07"])])
+        code, log, out = self.render(doc)
+        self.assertEqual(code, 0, log)
+        evidence = self.read(out, "evidence-map.md")
+        self.assertIn("使用者補充", evidence)
+        self.assertNotIn("✓ 原始文件", evidence)
+        self.assertIn("0 項來自原始文件", evidence)
+
+    def test_mixed_provenance_claim_takes_the_weaker_tier(self):
+        """One résumé ID plus one user-supplied ID is user-supplied, not 原始文件.
+
+        A paragraph fusing a documented fact with something said in conversation
+        must not inherit the stronger label: the moment the self-reported entry is
+        corrected, a claim marked 原始文件 keeps asserting it.
+        """
+        doc = document(
+            motivation=[claim("我把流程模板化，也自行以 Python 呼叫 OpenAI API。",
+                              evidence_ids=["EXP-01", "SKILL-07"])]
+        )
+        code, log, out = self.render(doc)
+        self.assertEqual(code, 0, log)
+        evidence = self.read(out, "evidence-map.md")
+        self.assertIn("使用者補充", evidence)
+        self.assertIn("1 項來自原始文件", evidence)
+
+    def test_provenance_label_is_not_printed_twice(self):
+        """A row with no evidence IDs shows its label once, not doubled."""
+        doc = document(
+            motivation=[claim("我的實作深度尚未涵蓋 RAG 與部署維運。",
+                              state="USER_CONFIRMED",
+                              note="2026-08-29 使用者本人陳述其技術範圍界線")]
+        )
+        code, log, out = self.render(doc)
+        self.assertEqual(code, 0, log)
+        evidence = self.read(out, "evidence-map.md")
+        self.assertNotIn("✓ 使用者補充　✓ 使用者補充", evidence)
+
     def test_self_reported_profile_entry_is_labelled_as_such(self):
         """A SUPPORTED claim backed by a conversation-sourced entry is not 原始文件."""
         doc = document(summary=[claim("SQL 資料撈取", evidence_ids=["SKILL-04"])])

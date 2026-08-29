@@ -93,6 +93,8 @@ For every requirement, search the profile for supporting evidence and assign exa
 
 When a requirement looks important and evidence is thin, **ask the user before concluding**. Ask concretely: 「JD 要求 SQL，但你的履歷裡沒有相關證據。你實際上用過 SQL 嗎？在哪個專案？」 If they give a real answer, it becomes `USER_CONFIRMED` and gets appended to the profile with a new ID. If they say no, it stays `UNSUPPORTED` and is not negotiable.
 
+**When the user contradicts the source résumé**, stop and ask. If the résumé lists a capability as absent and the user says they have it, say so plainly — 「你的履歷把 SQL 列為未具備，你剛說寫過。哪一個是對的？」 — and once they confirm, record both the new fact and the conflict in `profile.md`, per `references/profile-schema.md`. Never let the newer statement silently overwrite the older record.
+
 Never upgrade a state to make the application look better. An `UNSUPPORTED` requirement is useful information, not a problem to be solved by wording.
 
 ## Step 4 — Build the claims file

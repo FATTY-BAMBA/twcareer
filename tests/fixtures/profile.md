@@ -29,6 +29,8 @@ Source: source-resume.pdf — 工作經歷 #2
 - SKILL-01 社群內容企劃 — evidence: EXP-01 | Source: source-resume.pdf — 專長技能
 - SKILL-04 SQL — evidence: EXP-01 | Source: 使用者於 2026-08-28 補充
 
+- SKILL-07 OpenAI API 串接（Python 呼叫） | Source: USER_CONFIRMED 2026-08-29 — 使用者本人陳述：「用過 OpenAI API，自己用 Python 呼叫模型。」明確表示未做過 RAG 或生產環境部署
+
 ## Projects
 
 ### PROJ-01 — 官網改版
