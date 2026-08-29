@@ -285,6 +285,27 @@ def validate_claim(claim, where, profile_ids):
                 "`使用者於 YYYY-MM-DD 補充`."
             )
 
+        # Provenance is derived from the evidence, never declared. The renderer
+        # can compute the correct tier from the cited entries, so a declared
+        # state that disagrees is a defect in whatever produced the claims file
+        # — and a silent relabel would leave that defect in claims.json looking
+        # valid to every later reader. Fail instead.
+        #
+        # Only an overstatement can reach here: a claim with no IDs cannot be
+        # SUPPORTED (checked above), and understating is always safe.
+        self_reported_ids = [
+            i for i in ids if is_self_reported(profile_ids[i].get("source"))
+        ]
+        if state == "SUPPORTED" and self_reported_ids:
+            raise ValidationError(
+                f"{where}: declared provenance does not match the evidence. "
+                f'state is "SUPPORTED", but profile.md records '
+                f"{', '.join(self_reported_ids)} as user-supplied, so the derived "
+                'provenance is "USER_CONFIRMED". A claim is document-backed only '
+                "when every entry it cites is. Set the state to USER_CONFIRMED and "
+                "add a note recording what the user said."
+            )
+
     if state == "USER_CONFIRMED" and not str(claim.get("note") or "").strip():
         raise ValidationError(
             f"{where}: USER_CONFIRMED claim has no note recording what the user said."

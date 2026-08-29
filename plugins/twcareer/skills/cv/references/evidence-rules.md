@@ -34,6 +34,19 @@ Every `USER_CONFIRMED` claim is appended to the profile with a new ID, so the se
 ### UNSUPPORTED
 No evidence exists. **Never appears in résumé output.** Routed to the gap report.
 
+## State is derived, not chosen
+
+A claim's provenance follows from the profile entries it cites. You do not get to pick it:
+
+```
+every cited entry is document-backed   → SUPPORTED
+any cited entry is user-supplied       → USER_CONFIRMED
+```
+
+The weaker tier always wins. A paragraph resting on one résumé line and one thing the user said this morning is user-supplied, because the moment that self-reported entry is corrected, a claim marked 原始文件 goes on asserting it.
+
+The renderer computes the same thing from `profile.md` and **rejects the build** when the declared state overstates it. It does not quietly relabel — a wrong `state` left sitting in `claims.json` looks valid to everything that reads it later.
+
 ## The hard rule
 
 > Only `SUPPORTED` and `USER_CONFIRMED` claims may enter the application.

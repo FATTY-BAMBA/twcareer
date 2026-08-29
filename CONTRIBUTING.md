@@ -34,6 +34,16 @@ The skill reports its version at the start of every run by reading `plugin.json`
 
 Anything that changes the shape of `career/profile.md` or `claims.json` is breaking, because existing users have files in the old shape. Either bump MAJOR or write a migration.
 
+## The provenance invariant
+
+```
+claim text → evidence_ids → profile entries → provenance tier
+```
+
+Never `claim text → model says SUPPORTED → trust it`. The renderer derives the tier from the cited entries' `Source:` lines and refuses any claim whose declared state overstates it. Keep it that way: a validator that silently corrects hides the bug that produced the bad claim.
+
+Known future direction, deliberately not built yet: drop `state` from the schema entirely and have the renderer emit `derived_provenance`, so there is no contradictory field left to validate. That is a schema 3 change, not a 0.1.x one.
+
 ## Before pushing
 
 1. `git status` — confirm no `career/`, no `*.pdf`, no `profile.md`. The `.gitignore` covers these, but check anyway. A résumé in a public repo stays in git history after deletion.

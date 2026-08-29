@@ -211,13 +211,41 @@ class TestEvidenceResolution(RendererTestCase):
         its own 出處 column printed USER_CONFIRMED beside it — the application
         overstating its provenance by one tier.
         """
-        doc = document(summary=[claim("以 Python 呼叫 OpenAI API", evidence_ids=["SKILL-07"])])
+        doc = document(summary=[claim("以 Python 呼叫 OpenAI API",
+                                      state="USER_CONFIRMED",
+                                      note="2026-08-29 使用者本人陳述",
+                                      evidence_ids=["SKILL-07"])])
         code, log, out = self.render(doc)
         self.assertEqual(code, 0, log)
         evidence = self.read(out, "evidence-map.md")
         self.assertIn("使用者補充", evidence)
         self.assertNotIn("✓ 原始文件", evidence)
         self.assertIn("0 項來自原始文件", evidence)
+
+    def test_supported_claim_citing_self_reported_entry_is_rejected(self):
+        """Derive-and-reject: a declared state that overstates provenance fails.
+
+        Silently relabelling would leave a wrong `state` sitting in claims.json
+        looking valid to everything downstream. The build should say so instead.
+        """
+        doc = document(summary=[claim("以 Python 呼叫 OpenAI API", evidence_ids=["SKILL-07"])])
+        code, log, out = self.render(doc)
+        self.assertEqual(code, 2, log)
+        self.assertIn("declared provenance does not match", log)
+        self.assertIn("SKILL-07", log)
+        self.assertNothingRendered(out)
+
+    def test_mixed_provenance_supported_claim_is_rejected(self):
+        """One résumé ID plus one user-supplied ID cannot be declared SUPPORTED."""
+        doc = document(
+            motivation=[claim("我把流程模板化，也自行以 Python 呼叫 OpenAI API。",
+                              evidence_ids=["EXP-01", "SKILL-07"])]
+        )
+        code, log, out = self.render(doc)
+        self.assertEqual(code, 2, log)
+        self.assertIn("SKILL-07", log)
+        self.assertNotIn("EXP-01", log.split("does not match")[-1].split(".")[0])
+        self.assertNothingRendered(out)
 
     def test_mixed_provenance_claim_takes_the_weaker_tier(self):
         """One résumé ID plus one user-supplied ID is user-supplied, not 原始文件.
@@ -228,6 +256,8 @@ class TestEvidenceResolution(RendererTestCase):
         """
         doc = document(
             motivation=[claim("我把流程模板化，也自行以 Python 呼叫 OpenAI API。",
+                              state="USER_CONFIRMED",
+                              note="2026-08-29 使用者本人陳述",
                               evidence_ids=["EXP-01", "SKILL-07"])]
         )
         code, log, out = self.render(doc)
@@ -250,7 +280,10 @@ class TestEvidenceResolution(RendererTestCase):
 
     def test_self_reported_profile_entry_is_labelled_as_such(self):
         """A SUPPORTED claim backed by a conversation-sourced entry is not 原始文件."""
-        doc = document(summary=[claim("SQL 資料撈取", evidence_ids=["SKILL-04"])])
+        doc = document(summary=[claim("SQL 資料撈取",
+                                      state="USER_CONFIRMED",
+                                      note="2026-08-28 使用者本人陳述",
+                                      evidence_ids=["SKILL-04"])])
         code, log, out = self.render(doc)
         self.assertEqual(code, 0, log)
         evidence = self.read(out, "evidence-map.md")
