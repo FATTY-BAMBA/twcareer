@@ -18,35 +18,6 @@ Sections that matter: 個人簡介 / 工作經歷 / 專長技能 / 專案成就 
 
 ---
 
-## Reading 104's structured fields
-
-Last reviewed: 2026-08
-
-A 104 posting mixes prose the employer wrote with fields they filled from a
-dropdown. The two do not carry the same weight, and treating a metadata field
-as a screening rule is the JD-side version of the drift this tool refuses on
-the résumé side.
-
-| Field | What it is | How to treat it |
-|---|---|---|
-| 工作內容 / 主要職責 | free prose | the strongest signal of what the job is |
-| 條件要求（經歷、學歷、科系、語文） | employer-entered | **stated requirements** — report them as stated, do not assert they are eliminating filters |
-| 擅長工具 / 工作技能 | picked from 104's controlled vocabulary | weak on their own; promote to a requirement only when the prose corroborates them |
-| 其他條件 | free prose, usually 加分 | read the wording; often explicitly "有…尤佳" |
-| 可上班日 / 需求人數 / 管理責任 | employer-entered metadata | worth noting, not evidence of a hard cutoff |
-
-**Rule:** say what the posting says, and label how strictly it is enforced as
-unknown. 「職缺標示可上班日為兩週內，屬於需要注意的條件；是否為淘汰式硬門檻，要看雇主實際篩選方式。」
-Not 「兩週內是硬條件」. The same applies to 學歷 and 年資 — a posting saying
-「1 年以上」 is a stated requirement, not proof that a 10-month candidate is
-auto-rejected.
-
-A tag-only technology is a common trap. If 擅長工具 lists PostgreSQL but no
-sentence in the posting mentions a relational database, it is a weak signal —
-say so rather than building the whole application around it.
-
----
-
 ## 自傳
 
 Last reviewed: 2026-08

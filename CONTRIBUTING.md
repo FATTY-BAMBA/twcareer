@@ -9,7 +9,6 @@ plugins/twcareer/
   skills/cv/SKILL.md
   skills/cv/references/*.md         ← Taiwan judgment, one module per topic
   scripts/render_application.py     ← the evidence filter
-tests/                              ← renderer tests; run before every release
 ```
 
 The two `.claude-plugin/` directories are at different levels on purpose. `marketplace.json` sits at the repo root; `plugin.json` sits inside the plugin's own folder. They are not interchangeable and cannot share a directory.
@@ -19,8 +18,6 @@ The two `.claude-plugin/` directories are at different levels on purpose. `marke
 ```
 edit  →  bump version in plugins/twcareer/.claude-plugin/plugin.json  →  push  →  update in Cowork
 ```
-
-The skill reports its version at the start of every run by reading `plugin.json`, so a stale installed copy announces itself instead of silently applying old rules. Nothing to maintain by hand.
 
 **Always bump the version.** Update detection keys off the `version` field in `plugin.json`. Push a change without bumping and installed copies will not see it — and you will spend an hour debugging a fix that shipped correctly.
 
@@ -34,29 +31,32 @@ The skill reports its version at the start of every run by reading `plugin.json`
 
 Anything that changes the shape of `career/profile.md` or `claims.json` is breaking, because existing users have files in the old shape. Either bump MAJOR or write a migration.
 
+## Version reproducibility
+
+Every run prints its build:
+
+```
+twcareer 0.1.2 — renderer /path/to/render_application.py
+```
+
+`/twcareer:cv` prints it at the start, and every rendered file carries it in the footer. This exists because an installed copy can silently differ from what is committed — a stale install, an upload that never got replaced, a push without a version bump. When output looks wrong, check that line first. If it does not match the repo, you are debugging code you are not looking at.
+
+Check any build directly:
+
+```bash
+python3 plugins/twcareer/scripts/render_application.py --version
+```
+
 ## Before pushing
 
 1. `git status` — confirm no `career/`, no `*.pdf`, no `profile.md`. The `.gitignore` covers these, but check anyway. A résumé in a public repo stays in git history after deletion.
-2. Run the test suite. It covers the checks the product is built on — an unevidenced claim never reaching the application, and a `SUPPORTED` claim citing an ID that does not exist in `profile.md` failing the build rather than rendering.
+2. Run the renderer against a test claims file and confirm it still drops unevidenced claims:
 
    ```bash
-   python3 -m unittest discover tests
+   python3 plugins/twcareer/scripts/render_application.py path/to/claims.json
    ```
 
-   No dependencies; the fixtures live in `tests/fixtures/`. Add a case whenever you add a validation rule — a rule without a test is a rule that will regress quietly.
-
-   After a real adversarial run, check the rendered output too:
-
-   ```bash
-   python3 tests/check_adversarial.py career/outputs/<folder> \
-       --profile career/profile.md \
-       --claims career/outputs/<folder>/claims.json \
-       --forbid Python SQL RAG Docker
-   ```
-
-   It asserts that no forbidden capability reached the application, that each
-   one is surfaced in `gaps.md`, that every evidence row resolves, and that a
-   fake ID and a misspelled section still fail the build.
+   Deliberately break a claim — remove an `evidence_id` from a `SUPPORTED` one — and confirm it exits `2` rather than rendering. That check is the product; it should be exercised before every release.
 3. Bump the version.
 
 ## Testing a change

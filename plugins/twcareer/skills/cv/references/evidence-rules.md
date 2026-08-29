@@ -38,11 +38,7 @@ No evidence exists. **Never appears in résumé output.** Routed to the gap repo
 
 > Only `SUPPORTED` and `USER_CONFIRMED` claims may enter the application.
 
-This is enforced in `scripts/render_application.py`, which drops anything else before rendering.
-
-A second rule is enforced there too: **every cited ID must exist in `profile.md`**. A claim that points at `EXP-99` when no `EXP-99` was ever written fails the build. Without that check the first rule only proves a claim carries something ID-shaped, which is not the same as carrying evidence. The source shown in the evidence map is likewise read from the profile entry, not written alongside the claim, so the two cannot drift apart.
-
-The rule is code, not good intentions. Do not bypass the renderer, and do not hand-write output to include a claim the renderer rejected.
+This is enforced in `scripts/render_application.py`, which drops anything else before rendering. The rule is code, not good intentions. Do not bypass the renderer, and do not hand-write output to include a claim the renderer rejected.
 
 ## When the user asks you to add something they can't evidence
 

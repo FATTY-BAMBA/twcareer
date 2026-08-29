@@ -14,11 +14,6 @@ career/
 *.docx
 *.doc
 
-# Synthetic test fixtures are not personal data — the patterns above would
-# otherwise swallow tests/fixtures/profile.md and silently break the suite
-# for anyone who clones this repo.
-!tests/fixtures/**
-
 # ── Everything else ───────────────────────────────────────────────────────
 __pycache__/
 *.pyc
